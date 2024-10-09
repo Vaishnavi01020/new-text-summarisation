@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Summarizer and Q&A</title>
+    
+    <!-- Internal CSS -->
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 50px auto; 
+            padding: 30px; 
+            background: #fff; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            font-weight: 600; 
+        }
+        label { 
+            font-weight: 600; 
+            color: #555; 
+            display: block; 
+            margin-bottom: 10px; 
+        }
+        input[type="file"], 
+        input[type="text"], 
+        textarea { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #ddd; 
+            font-size: 16px; 
+            outline: none; 
+            background-color: #fafafa; 
+            transition: all 0.3s ease; 
+        }
+        textarea { 
+            resize: none; 
+            height: 180px; 
+        }
+        input[type="file"]:focus, 
+        input[type="text"]:focus, 
+        textarea:focus { 
+            border-color: #007BFF; 
+        }
+        button { 
+            padding: 12px 20px; 
+            margin: 10px 5px; 
+            border: none; 
+            background: linear-gradient(45deg, #6a11cb, #2575fc); 
+            color: white; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 16px; 
+            transition: background 0.3s ease; 
+        }
+        button:hover { 
+            background: linear-gradient(45deg, #5b10b1, #1c69d6); 
+        }
+        button:focus { 
+            outline: none; 
+        }
+        .result { 
+            margin-top: 20px; 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #eee; 
+        }
+        .speech-buttons { 
+            margin-top: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Summarizer and Q&A</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="file">Upload a Document:</label>
+            <input type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt"><br>
+
+            <label for="text_input">Or Enter Text Manually:</label>
+            <textarea name="text_input" placeholder="Type or paste your text here..."></textarea>
+
+            <label for="question">Ask a Question:</label>
+            <input type="text" name="question" placeholder="Type your question here...">
+
+            <button type="submit" name="action" value="summarize">Summarize</button>
+            <button type="submit" name="action" value="get_answer">Get Answer</button>
+        </form>
+
+        {% if answer %}
+            <h3>Result:</h3>
+            <div class="result" id="result">{{ answer }}</div>
+            <div class="speech-buttons">
+                <button onclick="speakText()">Read Aloud</button>
+                <button onclick="pauseReading()">Pause</button>
+                <button onclick="resumeReading()">Resume</button>
+                <button onclick="stopReading()">Stop</button>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let speechInstance = null;
+
+        function speakText() {
+            const text = document.getElementById('result').textContent;
+            if (text) { // Check if text exists
+                speechInstance = new SpeechSynthesisUtterance(text);
+                speechInstance.lang = 'en-US'; // Set language
+                speechInstance.pitch = 1;      // Set pitch
+                speechInstance.rate = 1;       // Set speed of voice
+                window.speechSynthesis.speak(speechInstance);
+            } else {
+                alert("No text to read aloud!");
+            }
+        }
+
+        function pauseReading() {
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                window.speechSynthesis.pause();
+            }
+        }
+
+        function resumeReading() {
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
+        }
+
+        function stopReading() {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+        }
+    </script>
+</body>
+</html>
